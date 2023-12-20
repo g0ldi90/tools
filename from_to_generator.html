@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>From/To Generator</title>
+</head>
+<body>
+    <h1>From/To Generator</h1>
+    
+    <div style="display: flex; justify-content: space-between;">
+        <!-- Section 1 -->
+        <div style="width: 48%;">
+            <h2>Copy text here</h2>
+            <textarea id="textbox1" rows="15" cols="30"></textarea>
+            <button onclick="extractSample()">Extract sample</button>
+        </div>
+        
+        <!-- Section 2 -->
+        <div style="width: 48%;">
+            <h2>Extracted From/To samples</h2>
+            <textarea id="textbox2" rows="15" cols="30" readonly></textarea>
+        </div>
+    </div>
+
+    <script>
+        function extractSample() {
+            const textbox1 = document.getElementById("textbox1");
+            const textbox2 = document.getElementById("textbox2");
+            
+            const lines = textbox1.value.split('\n');
+
+            const date = lines[0].trim();
+            const time = lines[1].trim();
+            const from = lines[6].trim().split('@')[0].trim();
+            const to = lines[10].trim().split('@')[0].trim();
+            const guid = lines[29].trim();
+
+            const extractedText = `Example XXX\nGUID: ${guid}\nFrom: ${from}\nTo: ${to}\nDate / time: ${date} ${time} UTC`;
+
+            // Replace [ and ] characters
+            const cleanedText = extractedText.replace(/\[|\]/g, '');
+
+            textbox2.value = cleanedText;
+        }
+    </script>
+<!-- Back to menu button -->
+    <a href="file:///C:/Users/mateusz.zlocinski/Desktop/html%20tools/menu.html">
+        <button>Back to Menu</button>
+    </a>	
+
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insight Stats Extractor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+        }
+
+        .section {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 45%;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 90%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        function updateRowCount(counterId, textBoxId, text) {
+            const rowCounter = document.getElementById(counterId);
+            const rowCount = text.trim().split('\n').filter(Boolean).length;
+            rowCounter.textContent = `Rows: ${rowCount}`;
+        }
+
+        function runScript() {
+            const inputText = document.getElementById('text-box-1').value;
+            const keywords = ['status', 'guid', 'medium', 'start'];
+            const uniqueGuids = {};
+            const filteredRows = inputText
+                .split('\n')
+                .filter(row => keywords.some(keyword => row.includes(keyword)))
+                .filter(row => {
+                    if (row.includes('guid')) {
+                        const guidValue = row.split('guid')[1].trim();
+                        if (uniqueGuids[guidValue]) {
+                            return false;
+                        } else {
+                            uniqueGuids[guidValue] = true;
+                            return true;
+                        }
+                    }
+                    return true;
+                })
+                .map(row => row.trim())
+                .map(row => {
+                    if (keywords.some(keyword => row.includes(keyword))) {
+                        return row + '\n';
+                    }
+                    return row;
+                })
+                .join('');
+            document.getElementById('text-box-2').value = filteredRows;
+            updateRowCount('text-box-2-counter', 'text-box-2', filteredRows);
+        }
+
+        document.getElementById('text-box-1').addEventListener('input', function () {
+            const inputText = this.value;
+            updateRowCount('text-box-1-counter', 'text-box-1', inputText);
+        });
+
+        function separateResults() {
+            const inputText = document.getElementById('text-box-2').value;
+            const rows = inputText.split('\n');
+            const separatedRows = [];
+            for (const row of rows) {
+                if (row.includes('start')) {
+                    separatedRows.push(row.trim() + '\n\n');
+                } else {
+                    separatedRows.push(row.trim() + '\n');
+                }
+            }
+            document.getElementById('text-box-2').value = separatedRows.join('');
+            updateRowCount('text-box-2-counter', 'text-box-2', separatedRows.join(''));
+        }
+    </script>
+</head>
+<body>
+    <h1>Insight Stats Extractor</h1>
+    <div class="container">
+        <div class="section">
+            <h2>Enter text here</h2>
+            <textarea id="text-box-1" rows="5" cols="30"></textarea>
+            <button onclick="runScript()">Run Script</button>
+        </div>
+        <div class="section">
+            <h2>Result</h2>
+            <textarea id="text-box-2" rows="5" cols="30"></textarea>
+            <button onclick="separateResults()">Separate Results</button>
+        </div>
+    </div>
+	
+	<!-- Back to menu button -->
+    <a href="file:///C:/Users/mateusz.zlocinski/Desktop/html%20tools/menu.html">
+        <button>Back to Menu</button>
+    </a>
+	
+</body>
+</html>

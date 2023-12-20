@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Log URL Generator</title>
+    <!-- Add a custom favicon from a URL -->
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/f/f9/Salesforce.com_logo.svg" type="image/x-icon">
+    <!-- The URL_TO_YOUR_FAVICON should be replaced with the actual URL of your favicon -->
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #007acc;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+        }
+
+        .level-2 {
+            display: flex;
+        }
+
+        .level-3 {
+            display: flex;
+        }
+
+        .level-2-left, .level-2-right, .level-3-left, .level-3-right, .level-4 {
+            flex: 1;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"], textarea {
+            width: 90%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        textarea {
+            height: auto; /* Adjust the height to fit the content */
+            width: 90%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            background-color: #007acc;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #005d9b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #666;
+            color: #fff;
+        }
+
+        .highlighted {
+            background-color: lightgreen;
+        }
+
+        .truncate {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Debug Log URL Generator</h1>
+    </header>
+
+    <!-- Level 2 -->
+    <div class="level-2">
+        <div class="level-2-left">
+            <!-- SOQL Query Template -->
+            <h2>SOQL Query Template</h2>
+            <textarea readonly rows="6" cols="60">
+SELECT Id, StartTime, Request, LogUserId, Status  
+FROM ApexLog 
+WHERE LogUserId = 'sf_user_id' 
+AND StartTime >= 2023-01-01T00:00:00Z 
+AND StartTime <= 2023-01-02T00:00:00Z 
+ORDER BY StartTime DESC
+            </textarea>
+        </div>
+        <div class="level-2-right">
+            <!-- Important Notes -->
+            <h2>Important Notes</h2>
+            <textarea id="importantNotes" readonly placeholder="Place your notes here">
+• Salesforce Inspector download link: 
+https://chrome.google.com/webstore/detail/salesforce-inspector/aodjmnfhjibkcdimpodiifdjnnncaafh 
+
+• StartTime column presents the time in UTC timezone,
+
+• 'Generate all URLs' opens all generated URLs at once in new browser tabs, in chronological order (oldest to newest).
+            </textarea>
+        </div>
+    </div>
+
+    <!-- Level 3 -->
+    <div class="level-3">
+        <div class="level-3-left">
+            <!-- Input URL -->
+            <h2>Input URL</h2>
+            <label for="customURL">Custom URL:</label>
+            <input type="text" id="customURL">
+        </div>
+        <div class="level-3-right">
+            <!-- Input CSV Table -->
+            <h2>Input CSV Table</h2>
+            <textarea id="csvTable" rows="10" cols="60" placeholder="_, Id, StartTime, Request, LogUserId, Status"></textarea>
+        </div>
+    </div>
+
+    <!-- Level 4 -->
+    <div class="level-4">
+        <!-- Generate URLs -->
+        <h2>Generate URLs</h2>
+        <button onclick="generateURLs()">Generate URLs</button>
+
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>StartTime (UTC)</th>
+                    <th>Request</th>
+                    <th>LogUserId</th>
+                    <th>Status</th>
+                    <th>URL</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+        <button id="exportButton" onclick="exportToXLSX()">Export to XLSX</button>
+        <button id="openAllURLsButton" onclick="openAllURLs()">Open all URLs</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
+
+    <script>
+        function generateURLs() {
+            const customURL = document.getElementById("customURL").value;
+            const csvData = document.getElementById("csvTable").value;
+
+            if (!customURL || !csvData) {
+                alert("Custom URL and CSV Table are required.");
+                return;
+            }
+
+            const lines = csvData.split('\n');
+            const tableBody = document.querySelector("#resultsTable tbody");
+            tableBody.innerHTML = '';
+
+            for (let i = 1; i < lines.length; i++) {
+                const columns = lines[i].split(',');
+                if (columns.length >= 2) {
+                    const id = columns[1].trim().replace(/"/g, ''); // Remove double quotes
+                    const url = `${customURL}apexdebug/traceDownload.apexp?id=${id}`;
+                    const row = tableBody.insertRow();
+
+                    for (let j = 1; j < columns.length; j++) {
+                        const cell = row.insertCell();
+                        const columnValue = columns[j].trim().replace(/"/g, ''); // Remove double quotes
+
+                        // Check if it's the 'Status' column and truncate if longer than 10 characters
+                        if (j === 5 && columnValue.length > 10) {
+                            cell.textContent = columnValue.substring(0, 10) + '...';
+                            cell.classList.add("truncate"); // Add class for CSS truncation
+                            cell.title = columnValue; // Add tooltip with the full value
+                        } else {
+                            cell.textContent = columnValue;
+                        }
+                    }
+
+                    const urlCell = row.insertCell();
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.target = '_blank';
+                    link.textContent = url;
+
+                    link.addEventListener('mouseup', function (event) {
+                        if (event.button === 1 || event.button === 0) { // Check if the middle (1) or left (0) mouse button was clicked
+                            row.classList.add("highlighted");
+                        }
+                    });
+
+                    urlCell.appendChild(link);
+                }
+            }
+        }
+
+        function exportToXLSX() {
+            const ws = XLSX.utils.table_to_sheet(document.getElementById("resultsTable"));
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Results");
+            XLSX.writeFile(wb, "debug_log_results.xlsx");
+        }
+
+        function openAllURLs() {
+            const links = document.querySelectorAll("#resultsTable a");
+
+            for (let i = links.length - 1; i >= 0; i--) {
+                window.open(links[i].href, '_blank');
+            }
+        }
+    </script>
+	
+	<!-- Back to menu button -->
+    <a href="file:///C:/Users/mateusz.zlocinski/Desktop/html%20tools/menu.html">
+        <button>Back to Menu</button>
+    </a>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concatenate Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+        }
+
+        .section {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 45%;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 90%; /* Reduce width by 10% */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+   <script>
+        function formatIDs() {
+            const inputText = document.getElementById('text-box-1').value;
+            const ids = inputText.split('\n').map(id => `'${id.replace(/'/g, '"')}'`).join(',\n');
+            document.getElementById('text-box-2').value = ids;
+
+            // Update row counters
+            updateRowCount('text-box-1-counter', 'text-box-1', inputText);
+            updateRowCount('text-box-2-counter', 'text-box-2', ids);
+        }
+
+        function switchQuotationMark() {
+            const text2 = document.getElementById('text-box-2').value;
+            const updatedText2 = text2.replace(/'/g, '"');
+            document.getElementById('text-box-2').value = updatedText2;
+
+            // Update row counter for text-box-2
+            updateRowCount('text-box-2-counter', 'text-box-2', updatedText2);
+        }
+
+        function updateRowCount(counterId, textBoxId, text) {
+            const rowCounter = document.getElementById(counterId);
+            const rowCount = text.trim().split('\n').filter(Boolean).length;
+            rowCounter.textContent = `Rows: ${rowCount}`;
+        }
+
+        // Corrected event listener for real-time updates on text-box-1
+        document.getElementById('text-box-1').addEventListener('input', function () {
+            const inputText = this.value;
+            updateRowCount('text-box-1-counter', 'text-box-1', inputText);
+        });
+    </script>
+</head>
+<body>
+    <h1>Concatenate Tool</h1>
+    <div class="container">
+        <div class="section">
+            <h2>Enter IDs here</h2>
+            <textarea id="text-box-1" rows="5" cols="30"></textarea>
+            <div id="text-box-1-counter">Rows: 0</div>
+            <button onclick="formatIDs()">Format IDs</button>
+        </div>
+        <div class="section">
+            <h2>Formatted IDs</h2>
+            <textarea id="text-box-2" rows="5" cols="30" readonly></textarea>
+            <div id="text-box-2-counter">Rows: 0</div>
+            <button onclick="switchQuotationMark()">Switch Quotation Mark</button>
+        </div>
+    </div>
+	
+	<!-- Back to menu button -->
+    <a href="file:///C:/Users/mateusz.zlocinski/Desktop/html%20tools/menu.html">
+        <button>Back to Menu</button>
+    </a>
+	
+</body>
+</html>

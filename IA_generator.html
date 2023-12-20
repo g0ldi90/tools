@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>String Parser</title>
+    <style>
+        /* Set equal width for both textboxes */
+        input[type="text"], textarea {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+    <script>
+        function generateList() {
+            // Get the input from textbox 1
+            var inputText = document.getElementById('textbox1').value;
+
+            // Use a regular expression to extract values between ">" and "<" signs
+            var matches = inputText.match(/>(.*?)</g);
+
+            // Check if matches were found
+            if (matches) {
+                // Remove ">" and "<" signs and set results in textbox 2
+                document.getElementById('textbox2').value = matches.map(function(match) {
+                    return match.replace(/[<>]/g, '');
+                }).join('\n');
+            } else {
+                // If no matches were found, display a message in textbox 2
+                document.getElementById('textbox2').value = 'No values found.';
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <label for="textbox1">Textbox 1:</label>
+    <input type="text" id="textbox1" placeholder="Enter a string">
+
+    <br>
+
+    <button onclick="generateList()">Generate List</button>
+
+    <br>
+
+    <label for="textbox2">Textbox 2:</label>
+    <textarea id="textbox2" rows="5" readonly></textarea>
+
+
+<!-- Back to menu button -->
+    <a href="file:///C:/Users/mateusz.zlocinski/Desktop/html%20tools/menu.html">
+        <button>Back to Menu</button>
+    </a>
+</body>
+</html>
